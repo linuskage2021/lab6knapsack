@@ -1,5 +1,6 @@
 ---
-title: "Laboration_6_vignette"
+title: "Laboration 6 Writing Fast R Code"
+author: "Linus Kage and Malke Marouki Group 4"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Laboration_6_vignette}
@@ -45,7 +46,7 @@ Question: How much time does it takes to run the algorithm for n = 16 objects?
 microbenchmark::microbenchmark(brute_force_knapsack(x = knapsack_objects[1:16,], W = 3500),times=10)
 ```
 
-It takes about 0.3 seconds to implement the function.
+When n = 16, it takes about 0.3 to 0.5 seconds to run the algorithm.
 
 ### Dynamic programming
 
@@ -56,7 +57,7 @@ Question: How much time does it takes to run the algorithm for n = 500 objects?
 microbenchmark::microbenchmark(knapsack_dynamic(x = knapsack_objects[1:500,], W = 3500),times=3)
 ```
 
-The needed time to implement the function with n=500 is about 28 seconds.
+Using 500 objects and the dynamic programming algorithm, it takes about 25-40 seconds to run the algorithm.
 
 ### Greedy heuristic
 
@@ -80,11 +81,14 @@ microbenchmark::microbenchmark(greedy_knapsack(x = knapsack_objects_1[1:1000000,
 
 ```
 
-It takes 0.3 seconds to implement the greedy_knapsack function.
+Using the greedy heuristics and 1000000 objects, the time it takes to run the algorithm is about 0.3 seconds.
+
 
 ---
 
 ## Profile your code and optimize your code
+
+We try to use `ifelse()`, which is vectorized, to try to speed up the computation.
 
 ```{r}
 knapsack_dynamic_opt <- function(x, W){
@@ -130,7 +134,7 @@ microbenchmark::microbenchmark(knapsack_dynamic_opt(x = knapsack_objects_1[1:500
 
 Question: What performance gain could you get by trying to improving your code?
 
-When running `profvis()`, we noticed a bottleneck in the dynamic programming. We use a nested for loop and if-else statement which took a long time to compute. 
+When running `profvis()`, we noticed a bottleneck in the dynamic programming. We used a nested for-loop and if-else statement which took a long time to compute. The results show that using the `ifelse()` makes the algorithm run slower compared to the previous code that did not use vectorized `ifelse()`.
 
 ## (*) Implentation in Rcpp
 
@@ -142,7 +146,7 @@ microbenchmark::microbenchmark(knapsack_dynamic(x = knapsack_objects[1:16,], W =
 
 Question: What performance gain could you get by using Rcpp and C++?
 
-Using C++ with the nested for loops, the run time is much lower compared to the code without C++ implementation. The run time of the algorithm without C++ code is about 25-30 seconds, and with C++ code it takes about 0,3 seconds which is a big improvement.
+Using C++ with the nested for-loops, the run time is much lower compared to the code without C++ implementation. The run time of the algorithm without C++ code is about 25-30 seconds, and with C++ code it takes about 0,3 seconds which is a big improvement.
 
 
 
