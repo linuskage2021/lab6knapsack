@@ -1,5 +1,12 @@
 greedy_knapsack <- function(x, W){
 
+
+  stopifnot(W > 0)
+  if(is.data.frame(x) != TRUE) stop("The data input is not a data.frame")
+  if(!identical(colnames(x), c("w", "v"))) stop("The columns names in data is wrong.")
+
+
+
   x$ratio <- x$v/x$w
 
   x <- x[order(x$ratio, decreasing = TRUE),]
@@ -24,3 +31,4 @@ greedy_knapsack <- function(x, W){
   ret_list <- list(value = round(sum_value), elements = index)
   return(ret_list)
 }
+

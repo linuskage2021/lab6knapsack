@@ -1,4 +1,12 @@
-knapsack_brute_force <- function(x, W){
+brute_force_knapsack <- function(x, W){
+
+  stopifnot(W > 0)
+  if(is.data.frame(x) != TRUE) stop("The data input is not a data.frame")
+  if(!identical(colnames(x), c("w", "v"))) stop("The columns names in data is wrong.")
+
+
+
+
 
   n <- nrow(x)
 
@@ -41,3 +49,4 @@ knapsack_brute_force <- function(x, W){
 
   return(list(value = round(bestValue), elements = t_elements))
 }
+
