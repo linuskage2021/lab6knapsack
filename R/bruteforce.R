@@ -1,3 +1,22 @@
+#' Brute force method for knapsack problem.
+#'
+#' @param x is a data.frame containing two columns, w and v.
+#' @param W is the capacity of the knapsack and is an integer greater than 0.
+#'
+#' @return Returns a list containing the maximum value of combination of the objects and the objects in the combination.
+#' @export
+#'
+#' @examples
+#' #'suppressWarnings(RNGversion(min(as.character(getRversion()),"3.5.3")))
+#'set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+#'n <- 2000
+#'knapsack_objects <-
+#'  data.frame(
+#'    w=sample(1:4000, size = n, replace = TRUE),
+#'    v=runif(n = n, 0, 10000)
+#'  )
+#'
+#' brute_force_knapsack(knapsack_objects[1:8,], W = 3500)
 brute_force_knapsack <- function(x, W){
 
   stopifnot(W > 0)
@@ -14,19 +33,20 @@ brute_force_knapsack <- function(x, W){
   t_elements <- vector(mode = "numeric")
   bestValue <- 0
   bestWeigth <- 0
-  #Skapar matrisen med massa 0or men n rader, 2^n columner.
+
+
   for(j in 1:2^n){
     A[,j] <- as.numeric(intToBits(j))[1:n]
   }
 
 
-  for(i in 1:2^n){ #i är columns
+  for(i in 1:2^n){
     tempWeight <- 0
     tempValue <- 0
     elements <- c()
 
 
-    for(k in 1:n){ #k är rad.
+    for(k in 1:n){
 
       if(A[k,i] == 1){
         tempWeight <- tempWeight + x$w[k]
