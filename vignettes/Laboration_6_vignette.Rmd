@@ -1,0 +1,150 @@
+---
+title: "Laboration_6_vignette"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Laboration_6_vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Importing the library and creating knapsack object:
+
+```{r setup, warning=FALSE, message=FALSE}
+library(lab6knapsack)
+library(Rcpp)
+
+RNGversion(min(as.character(getRversion()),"3.5.3"))
+
+##old sampler used for backward compatibility
+## suppressWarnings() can be used so that the above warning is not displayed
+
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+n <- 2000
+knapsack_objects <-
+data.frame(
+w=sample(1:4000, size = n, replace = TRUE),
+v=runif(n = n, 0, 10000)
+)
+
+```
+
+## Methods:
+
+### Brute force search:
+
+Question: How much time does it takes to run the algorithm for n = 16 objects?
+
+```{r}
+microbenchmark::microbenchmark(brute_force_knapsack(x = knapsack_objects[1:16,], W = 3500),times=10)
+```
+
+It takes about 0.3 seconds to implement the function.
+
+### Dynamic programming
+
+Question: How much time does it takes to run the algorithm for n = 500 objects?
+
+
+```{r}
+microbenchmark::microbenchmark(knapsack_dynamic(x = knapsack_objects[1:500,], W = 3500),times=3)
+```
+
+The needed time to implement the function with n=500 is about 28 seconds.
+
+### Greedy heuristic
+
+Question: How much time does it takes to run the algorithm for n = 1000000 objects?
+
+```{r}
+RNGversion(min(as.character(getRversion()),"3.5.3"))
+
+##old sampler used for backward compatibility
+## suppressWarnings() can be used so that the above warning is not displayed
+
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+n <- 1000000
+knapsack_objects_1 <-
+data.frame(
+w=sample(1:4000, size = n, replace = TRUE),
+v=runif(n = n, 0, 10000)
+)
+
+microbenchmark::microbenchmark(greedy_knapsack(x = knapsack_objects_1[1:1000000,], W = 3500),times=3)
+
+```
+
+It takes 0.3 seconds to implement the greedy_knapsack function.
+
+---
+
+## Profile your code and optimize your code
+
+```{r}
+knapsack_dynamic_opt <- function(x, W){
+  
+  n <- nrow(x)
+  
+  m <- matrix(data = 0, nrow = n, ncol = W)
+  
+  for(i in 2:n){
+    
+    for(j in 1:W){
+      
+      #Vectorized ifelse statement
+      m[i,j] <- ifelse(x[i,1] > j, m[i-1,j], max(m[i-1,j], m[i-1,j-x$w[i]] + x$v[i]))
+    }
+  }
+  
+  
+  
+  n <- nrow(x)
+  c <- W
+  element <- vector()
+  while(c > 0){
+    if(m[n,c] != m[n-1,c]){
+      element <- c(element, n)
+      c <- c - x$w[n]
+      
+      
+      
+    }
+    n <- n-1
+    if(n == 1) break
+  }
+  
+  return(list(value = round(max(m)), element = rev(element)))
+}
+
+```
+
+```{r ,eval=TRUE}
+microbenchmark::microbenchmark(knapsack_dynamic_opt(x = knapsack_objects_1[1:500,], W = 3500),times=3)
+```
+
+Question: What performance gain could you get by trying to improving your code?
+
+When running `profvis()`, we noticed a bottleneck in the dynamic programming. We use a nested for loop and if-else statement which took a long time to compute. 
+
+## (*) Implentation in Rcpp
+
+```{r,eval=FALSE}
+#Run with C++ code.
+microbenchmark::microbenchmark(knapsack_dynamic(x = knapsack_objects[1:16,], W = 3500,fast = TRUE),times=3)
+
+```
+
+Question: What performance gain could you get by using Rcpp and C++?
+
+Using C++ with the nested for loops, the run time is much lower compared to the code without C++ implementation. The run time of the algorithm without C++ code is about 25-30 seconds, and with C++ code it takes about 0,3 seconds which is a big improvement.
+
+
+
+
+
