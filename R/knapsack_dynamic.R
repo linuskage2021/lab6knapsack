@@ -70,7 +70,7 @@ knapsack_dynamic <- function(x, W, fast = FALSE){
   }
 
 
-  return(list(value = round(max(m)), element = rev(element)))
+  return(list(value = round(max(m)), elements = rev(element)))
 }
 
 
